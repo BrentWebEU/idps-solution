@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata
+    network_mode: host # Allows Suricata to inspect host network traffic
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW # Required for network sniffing
+    volumes:
+      - ./logs:/var/log/suricata # Mounts local logs directory to container's Suricata logs
+      # You might also want to mount a custom Suricata configuration if needed:
+      # - ./suricata/config:/etc/suricata
+    restart: unless-stopped
+    environment:
+      # Example environment variables, adjust as needed:
+      # - OINKCODE=your_oinkcode_here # For pulling Emerging Threats Pro rules
+      - TZ=Europe/Brussels # Set timezone
+  api:
+    build:
+      context: ../api
+    container_name: api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/var/log/suricata
+    depends_on:
+      - suricata
+    restart: unless-stopped
+
