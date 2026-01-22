@@ -31,8 +31,8 @@ COPY --from=builder /usr/src/app/target/release/idps-api /usr/local/bin/idps-api
 # Expose port
 EXPOSE 8080
 
-# Ensure the application listens on localhost only
-ENV LISTEN_ADDRESS=127.0.0.1
+# Ensure the application listens on all interfaces
+ENV LISTEN_ADDRESS=0.0.0.0
 
 # Set environment variable (default to prod)
 ENV APP_ENV=prod
