@@ -16,6 +16,21 @@ pub struct ExecRequest {
     pub args: Vec<String>,
 }
 
+#[get("/")]
+async fn root() -> impl Responder {
+    HttpResponse::Ok().json(serde_json::json!({
+        "message": "Suricata API",
+        "example": {
+            "endpoint": "/suricata/exec",
+            "method": "POST",
+            "body": {
+                "command": "suricata",
+                "args": ["-V"]
+            }
+        }
+    }))
+}
+
 #[post("/suricata/exec")]
 async fn execute_suricata_command(
     req_body: web::Json<ExecRequest>,
@@ -94,17 +109,3 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
-#[get("/")]
-async fn root() -> impl Responder {
-    HttpResponse::Ok().json(serde_json::json!({
-        "message": "Suricata API",
-        "example": {
-            "endpoint": "/suricata/exec",
-            "method": "POST",
-            "body": {
-                "command": "suricata",
-                "args": ["-V"]
-            }
-        }
-    }))
-}
