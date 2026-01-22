@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM rust:1.73 as builder
+FROM rust:1.92 AS builder
 
 WORKDIR /usr/src/app
 
@@ -14,16 +14,28 @@ RUN cargo build --release
 RUN rm -f target/release/deps/idps_api*
 
 # Copy the actual source code
-COPY src/main.rs ./src/
+COPY src ./src/
 
-# Build the application
+# Build the actual application
 RUN cargo build --release
 
 # Stage 2: Create the final image
-FROM debian:buster-slim
+FROM debian:bookworm-slim
+
+# Install runtime dependencies for Actix
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Copy the binary from the builder stage
 COPY --from=builder /usr/src/app/target/release/idps-api /usr/local/bin/idps-api
 
+# Expose port
+EXPOSE 8080
+
+# Ensure the application listens on all interfaces
+ENV LISTEN_ADDRESS=0.0.0.0
+
+# Set environment variable (default to prod)
+ENV APP_ENV=prod
+
 # Set the command to run the application
-CMD ["idps-api"]
+CMD ["/usr/local/bin/idps-api"]
