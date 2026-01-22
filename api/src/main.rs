@@ -15,7 +15,7 @@ pub struct ExecRequest {
     pub args: Vec<String>,
 }
 
-#[get("/")]
+#[get("/api")]
 async fn root() -> impl Responder {
     HttpResponse::Ok().json(serde_json::json!({
         "message": "Suricata API",
@@ -30,7 +30,7 @@ async fn root() -> impl Responder {
     }))
 }
 
-#[post("/suricata/exec")]
+#[post("/api/suricata/exec")]
 async fn execute_suricata_command(
     req_body: web::Json<ExecRequest>,
     docker_client: web::Data<DockerClient>,
