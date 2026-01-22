@@ -1,9 +1,8 @@
 use actix_web::{App, HttpResponse, HttpServer, Responder, get, post, web};
-use std::env;
-use tokio::process::Command;
 use bollard::Docker;
+use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
-use futures_util::stream::StreamExt; // Required for stream.next().await
+use std::env; // Required for stream.next().await
 
 // This struct will hold the Docker client instance
 struct DockerClient {
@@ -42,13 +41,25 @@ async fn execute_suricata_command(
     let config = bollard::exec::CreateExecOptions {
         attach_stdout: Some(true),
         attach_stderr: Some(true),
-        cmd: Some(vec![req_body.command.clone()].into_iter().chain(req_body.args.clone().into_iter()).collect()),
+        cmd: Some(
+            vec![req_body.command.clone()]
+                .into_iter()
+                .chain(req_body.args.clone().into_iter())
+                .collect(),
+        ),
         ..Default::default()
     };
 
-    let exec_instance = match docker_client.docker.create_exec(container_name, config).await {
+    let exec_instance = match docker_client
+        .docker
+        .create_exec(container_name, config)
+        .await
+    {
         Ok(exec) => exec.id,
-        Err(e) => return HttpResponse::InternalServerError().body(format!("Failed to create exec instance: {}", e)),
+        Err(e) => {
+            return HttpResponse::InternalServerError()
+                .body(format!("Failed to create exec instance: {}", e));
+        }
     };
 
     // Start the exec instance
@@ -57,9 +68,16 @@ async fn execute_suricata_command(
         ..Default::default()
     };
 
-    let response = match docker_client.docker.start_exec(&exec_instance, Some(start_exec_options)).await {
+    let response = match docker_client
+        .docker
+        .start_exec(&exec_instance, Some(start_exec_options))
+        .await
+    {
         Ok(response) => response,
-        Err(e) => return HttpResponse::InternalServerError().body(format!("Failed to start exec instance: {}", e)),
+        Err(e) => {
+            return HttpResponse::InternalServerError()
+                .body(format!("Failed to start exec instance: {}", e));
+        }
     };
 
     let mut stdout = String::new();
@@ -75,7 +93,8 @@ async fn execute_suricata_command(
             }
         }
     } else {
-        return HttpResponse::InternalServerError().body("Failed to get output from exec instance.");
+        return HttpResponse::InternalServerError()
+            .body("Failed to get output from exec instance.");
     }
 
     HttpResponse::Ok().json(serde_json::json!({
@@ -93,19 +112,17 @@ async fn main() -> std::io::Result<()> {
 
     println!("Starting server on http://{}", bind_address);
 
-    let docker = Docker::connect_with_http_defaults()
-        .expect("Failed to connect to Docker daemon");
+    let docker = Docker::connect_with_http_defaults().expect("Failed to connect to Docker daemon");
 
     let docker_client = web::Data::new(DockerClient { docker });
 
     HttpServer::new(move || {
         App::new()
             .app_data(docker_client.clone())
-            .service(execute_suricata_command)
             .service(root)
+            .service(execute_suricata_command)
     })
     .bind(&bind_address)?
     .run()
     .await
 }
-
