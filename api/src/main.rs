@@ -87,6 +87,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(docker_client.clone())
             .service(execute_suricata_command)
+            .service(root)
     })
     .bind(&bind_address)?
     .run()
