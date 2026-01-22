@@ -106,7 +106,7 @@ async fn execute_suricata_command(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let listen_address = env::var("LISTEN_ADDRESS").unwrap_or_else(|_| "127.0.0.1".to_string());
+    let listen_address = env::var("LISTEN_ADDRESS").unwrap_or_else(|_| "0.0.0.0".to_string());
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
     let bind_address = format!("{}:{}", listen_address, port);
 
