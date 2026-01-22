@@ -1,4 +1,4 @@
-use actix_web::{App, HttpResponse, HttpServer, Responder, post, web};
+use actix_web::{App, HttpResponse, HttpServer, Responder, get, post, web};
 use std::env;
 use tokio::process::Command;
 use bollard::Docker;
@@ -91,4 +91,19 @@ async fn main() -> std::io::Result<()> {
     .bind(&bind_address)?
     .run()
     .await
+}
+
+#[get("/")]
+async fn root() -> impl Responder {
+    HttpResponse::Ok().json(serde_json::json!({
+        "message": "Suricata API",
+        "example": {
+            "endpoint": "/suricata/exec",
+            "method": "POST",
+            "body": {
+                "command": "suricata",
+                "args": ["-V"]
+            }
+        }
+    }))
 }
