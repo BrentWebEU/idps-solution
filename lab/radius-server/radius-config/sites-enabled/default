@@ -1,0 +1,87 @@
+server default {
+    listen {
+        type = auth
+        ipaddr = *
+        port = 0
+        limit {
+            max_connections = 16
+            lifetime = 0
+            idle_timeout = 30
+        }
+    }
+
+    authorize {
+        filter_username
+        preprocess
+        auth_log
+        files
+        mschap
+        digest
+        suffix
+        eap {
+            ok = return
+        }
+        expiration
+        logintime
+        pap
+    }
+
+    authenticate {
+        Auth-Type PAP {
+            pap
+        }
+        Auth-Type CHAP {
+            chap
+        }
+        Auth-Type MS-CHAP {
+            mschap
+        }
+        Auth-Type Digest {
+            digest
+        }
+        eap
+    }
+
+    preaccounting {
+        preprocess
+        accounting
+        attr_filter.accounting_response
+    }
+
+    accounting {
+        detail
+        unix
+        radutmp
+        attr_filter.accounting_response
+    }
+
+    session {
+        radutmp
+    }
+
+    post-auth {
+        update {
+            &reply: += {
+                &Class = "1"
+            }
+        }
+        update reply {
+            Reply-Message := "Access Granted"
+        }
+        Post-Auth-Type REJECT {
+            attr_filter.access_reject
+            eap
+            remove_reply_message_if_eap
+        }
+        Post-Auth-Type Challenge {
+            remove_reply_message_if_eap
+        }
+    }
+
+    pre-proxy {
+    }
+
+    post-proxy {
+        eap
+    }
+}

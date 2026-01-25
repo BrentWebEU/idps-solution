@@ -1,0 +1,86 @@
+# School WPA2 Enterprise User Database
+# Format: username Cleartext-Password := "password", User-Role := "role"
+
+# ============================================
+# ADMINISTRATIVE STAFF
+# ============================================
+admin        Cleartext-Password := "Admin@2024!"
+             User-Role := "admin",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 100
+
+it-admin      Cleartext-Password := "IT@Secure123"
+             User-Role := "admin",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 100
+
+# ============================================
+# FACULTY / TEACHERS
+# ============================================
+teacher01     Cleartext-Password := "Teacher2024!"
+             User-Role := "faculty",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 200
+
+teacher02     Cleartext-Password := "Teach@Pass123"
+             User-Role := "faculty",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 200
+
+smith.j       Cleartext-Password := "Smith2024!"
+             User-Role := "faculty",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 200
+
+# ============================================
+# STUDENTS
+# ============================================
+student01     Cleartext-Password := "Student123!"
+             User-Role := "student",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 300
+
+student02     Cleartext-Password := "Pass2024!"
+             User-Role := "student",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 300
+
+john.doe      Cleartext-Password := "John2024!"
+             User-Role := "student",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 300
+
+jane.smith    Cleartext-Password := "Jane2024!"
+             User-Role := "student",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 300
+
+# ============================================
+# GUEST ACCOUNTS (Weak passwords - vulnerable)
+# ============================================
+guest         Cleartext-Password := "guest"
+             User-Role := "guest",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 400
+
+guest01       Cleartext-Password := "password"
+             User-Role := "guest",
+             Tunnel-Type := VLAN,
+             Tunnel-Medium-Type := IEEE-802,
+             Tunnel-Private-Group-Id := 400
+
+# ============================================
+# DEFAULT ENTRIES
+# ============================================
+DEFAULT       Auth-Type := Reject
+             Reply-Message := "Authentication Failed"

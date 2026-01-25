@@ -1,0 +1,9 @@
+auth_log {
+    destination = files
+    file = ${logdir}/auth.log
+    syslog_facility = daemon
+    stripped_names = no
+    auth = yes
+    auth_badpass = no
+    auth_goodpass = no
+}

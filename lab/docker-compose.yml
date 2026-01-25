@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  # Attacker machine (Kali Linux)
+  kali:
+    image: kalilinux/kali-rolling
+    container_name: pentest-kali
+    networks:
+      - attacker-net
+    volumes:
+      - kali-data:/root
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+
+  # DMZ Network - Public facing web server (old Apache version)
+  web-server:
+    image: httpd:2.4.41
+    container_name: pentest-web
+    networks:
+      - dmz-net
+      - internal-net
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web-server:/usr/local/apache2/htdocs:ro
+    command: httpd-foreground
+
+  # Internal Network - Database (weak credentials, exposed)
+  db-server:
+    image: mysql:5.7
+    container_name: pentest-db
+    networks:
+      - internal-net
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: company_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin123
+    volumes:
+      - db-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
+
+  # Internal Network - File Server (FTP/SMB)
+  file-server:
+    build:
+      context: ./file-server
+      dockerfile: Dockerfile
+    container_name: pentest-fileserver
+    networks:
+      - internal-net
+    ports:
+      - "21:21"
+      - "445:445"
+      - "139:139"
+    volumes:
+      - file-data:/shared
+
+  # Internal Network - Vulnerable Linux System
+  vulnerable-linux:
+    build:
+      context: ./vulnerable-linux
+      dockerfile: Dockerfile
+    container_name: pentest-vuln-linux
+    networks:
+      - internal-net
+    ports:
+      - "22:22"
+    volumes:
+      - vuln-linux-data:/home
+    environment:
+      - SSH_PASSWORD=password123
+      - FLAG=FLAG{Initial_Access_Obtained}
+
+  # WPA2 Enterprise RADIUS Server
+  radius-server:
+    build:
+      context: ./radius-server
+      dockerfile: Dockerfile
+    container_name: pentest-radius
+    networks:
+      - dmz-net
+      - internal-net
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+      - "18120:18120/udp"
+    volumes:
+      - radius-data:/var/log/freeradius
+    environment:
+      - RADIUS_SECRET=schoolradius123
+
+  # Jump Host / Gateway (simulates network segmentation)
+  gateway:
+    image: alpine:latest
+    container_name: pentest-gateway
+    networks:
+      - dmz-net
+      - internal-net
+      - attacker-net
+    command: sh -c "apk add --no-cache iptables && iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE && tail -f /dev/null"
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+
+networks:
+  attacker-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+  dmz-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/24
+  internal-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/24
+  # VLAN Networks for role-based access
+  admin-vlan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/24
+  faculty-vlan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/24
+  student-vlan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+  guest-vlan:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24
+
+volumes:
+  kali-data:
+  db-data:
+  file-data:
+  vuln-linux-data:
+  radius-data:

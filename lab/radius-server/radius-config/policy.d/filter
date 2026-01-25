@@ -1,0 +1,8 @@
+filter_username {
+    if (User-Name =~ /@/) {
+        update request {
+            Stripped-User-Name := "%{1}"
+            Realm := "%{2}"
+        }
+    }
+}

@@ -1,0 +1,3 @@
+expiration {
+    reply-message = "Password Has Expired  "
+}

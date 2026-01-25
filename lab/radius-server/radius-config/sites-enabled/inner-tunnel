@@ -1,0 +1,51 @@
+server inner-tunnel {
+    listen {
+        ipaddr = 127.0.0.1
+        port = 18120
+        type = auth
+    }
+
+    authorize {
+        files
+        mschap
+        digest
+        suffix
+        eap
+        files
+        expiration
+        logintime
+        pap
+    }
+
+    authenticate {
+        Auth-Type PAP {
+            pap
+        }
+        Auth-Type CHAP {
+            chap
+        }
+        Auth-Type MS-CHAP {
+            mschap
+        }
+        Auth-Type Digest {
+            digest
+        }
+        eap
+    }
+
+    session {
+        radutmp
+    }
+
+    post-auth {
+        update {
+            &reply: += {
+                &Class = "1"
+            }
+        }
+        Post-Auth-Type REJECT {
+            attr_filter.access_reject
+            eap
+        }
+    }
+}
