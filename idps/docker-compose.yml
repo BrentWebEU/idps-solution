@@ -17,6 +17,11 @@ services:
     # Volume mount voor logs - logs worden opgeslagen op de host
     volumes:
       - ./logs:/var/log/suricata
+<<<<<<< HEAD
+=======
+      - ./rules/custom:/etc/suricata/rules/custom:ro
+      - ./rules/active:/etc/suricata/rules/active:ro
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     # Suricata start commando - monitort eth0 interface
     command: suricata -i eth0
     restart: unless-stopped

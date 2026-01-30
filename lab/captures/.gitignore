@@ -1,0 +1,4 @@
+*.pcap
+*.pcapng
+*.cap
+*.cap.gz

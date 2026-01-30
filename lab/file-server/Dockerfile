@@ -48,7 +48,11 @@ RUN echo "[shared]\n\
 
 # Create SMB user
 RUN useradd -m -s /bin/bash smbuser && \
+<<<<<<< HEAD
     echo -e "smbuser\nsmbuser" | smbpasswd -a -s smbuser
+=======
+    printf "smbuser\nsmbuser\n" | smbpasswd -a -s smbuser
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
 
 # Create shared directory
 RUN mkdir -p /shared && \

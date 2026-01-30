@@ -133,9 +133,94 @@ docker-compose ps
 docker-compose logs -f
 ```
 
+<<<<<<< HEAD
 ### Accessing Services
 
 - **Web Server:** http://localhost:8080
+=======
+### External Penetration Testing
+
+The lab also supports external penetration testing against external targets:
+
+```bash
+# Run external pentest against configured target (144.178.248.26)
+./scripts/external-pentest.sh
+
+# Or specify custom IP
+./scripts/external-pentest.sh <target-ip>
+```
+
+See [EXTERNAL-PENTEST.md](docs/EXTERNAL-PENTEST.md) for detailed external pentest documentation.
+
+## Attack Testing (DDOS, Brute-Force, Network Infiltration)
+
+The lab includes specialized attack testing scripts for IDPS rule development:
+
+### DDOS Attack Testing
+
+```bash
+# Run all DDOS attack types (30 seconds)
+./scripts/ddos-attack.sh [target_ip] [port] [duration] [attack_type]
+
+# Examples:
+./scripts/ddos-attack.sh 172.21.0.2 80 60 syn_flood
+./scripts/ddos-attack.sh 172.21.0.2 80 30 all
+```
+
+### Brute Force Attack Testing
+
+```bash
+# Brute force specific service
+./scripts/brute-force-attack.sh [target_ip] [service] [username] [wordlist_size]
+
+# Examples:
+./scripts/brute-force-attack.sh 172.22.0.5 ssh
+./scripts/brute-force-attack.sh 172.22.0.4 ftp ftpuser medium
+./scripts/brute-force-attack.sh 172.22.0.5 all
+```
+
+### Network Infiltration Testing
+
+```bash
+# Run infiltration scenario
+./scripts/network-infiltration.sh [initial_target] [infiltration_type]
+
+# Examples:
+./scripts/network-infiltration.sh 172.21.0.2 all
+./scripts/network-infiltration.sh 172.21.0.2 lateral_movement
+```
+
+See [ATTACK-TESTING.md](docs/ATTACK-TESTING.md) for comprehensive attack testing documentation.
+
+### Quick Start: Run All Attacks
+
+For a complete attack test suite that runs everything automatically:
+
+```bash
+# Run all attacks (DDOS, Brute-Force, Network Infiltration)
+./scripts/run-all-attacks.sh [web_ip] [linux_ip] [db_ip] [ftp_ip] [ddos_duration]
+
+# Default configuration (all attacks, 30s DDOS)
+./scripts/run-all-attacks.sh
+
+# Custom configuration
+./scripts/run-all-attacks.sh 172.21.0.2 172.22.0.5 172.22.0.3 172.22.0.4 60
+```
+
+This script automatically:
+1. Starts traffic capture
+2. Runs DDOS attacks (SYN flood, HTTP flood)
+3. Runs brute force attacks (SSH, FTP, MySQL)
+4. Runs network infiltration (discovery, lateral movement, exfiltration)
+5. Stops traffic capture
+6. Analyzes captured traffic
+7. Extracts findings
+8. Generates comprehensive HTML report
+
+### Accessing Services
+
+- **Web Server:** http://localhost:8081
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
 - **RADIUS Server:** localhost:1812/udp, 1813/udp
 - **MySQL:** localhost:3306
 - **FTP:** localhost:21

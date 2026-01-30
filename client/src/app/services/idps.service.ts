@@ -105,4 +105,82 @@ export class IdpsService {
       })
     );
   }
+<<<<<<< HEAD
+=======
+
+  // PCAP Analysis Methods
+  analyzePcap(pcapFile: string, options?: any): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/pcap/analyze`, {
+      pcap_file: pcapFile,
+      analysis_options: options
+    }).pipe(
+      catchError(error => {
+        console.error('Fout bij analyseren PCAP:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getFindings(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/pcap/findings`).pipe(
+      catchError(error => {
+        console.error('Fout bij ophalen findings:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Rule Management Methods
+  generateRule(finding: any): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/rules/generate`, finding).pipe(
+      catchError(error => {
+        console.error('Fout bij genereren regel:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  listRules(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.apiUrl}/rules/list`).pipe(
+      catchError(error => {
+        console.error('Fout bij ophalen regels:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  activateRule(ruleFile: string): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/rules/activate`, {
+      rule_file: ruleFile
+    }).pipe(
+      catchError(error => {
+        console.error('Fout bij activeren regel:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  deactivateRule(ruleFile: string): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/rules/deactivate`, {
+      rule_file: ruleFile
+    }).pipe(
+      catchError(error => {
+        console.error('Fout bij deactiveren regel:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  testRules(pcapFile: string, ruleFile?: string): Observable<ApiResponse> {
+    return this.http.post<ApiResponse>(`${this.apiUrl}/rules/test`, {
+      pcap_file: pcapFile,
+      rule_file: ruleFile
+    }).pipe(
+      catchError(error => {
+        console.error('Fout bij testen regels:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
 }

@@ -1,0 +1,17 @@
+# Brute Force Detection Rules Template
+# These rules detect multiple failed authentication attempts
+
+# SSH Brute Force Detection
+alert ssh any any -> $HOME_NET 22 (msg:"SSH Brute Force Attempt"; flow:established,to_server; threshold:type threshold, track by_src, count 5, seconds 60; sid:1000001; rev:1;)
+
+# FTP Brute Force Detection
+alert ftp any any -> $HOME_NET 21 (msg:"FTP Brute Force Attempt"; flow:established,to_server; threshold:type threshold, track by_src, count 5, seconds 60; sid:1000002; rev:1;)
+
+# MySQL Brute Force Detection
+alert mysql any any -> $HOME_NET 3306 (msg:"MySQL Brute Force Attempt"; flow:established,to_server; threshold:type threshold, track by_src, count 5, seconds 60; sid:1000003; rev:1;)
+
+# RADIUS Brute Force Detection
+alert udp any any -> $HOME_NET 1812 (msg:"RADIUS Brute Force Attempt"; threshold:type threshold, track by_src, count 10, seconds 60; sid:1000004; rev:1;)
+
+# Generic Authentication Failure Pattern
+alert tcp any any -> $HOME_NET any (msg:"Multiple Authentication Failures"; flow:established,to_server; threshold:type threshold, track by_src, count 10, seconds 120; sid:1000005; rev:1;)

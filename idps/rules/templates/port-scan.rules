@@ -1,0 +1,17 @@
+# Port Scan Detection Rules Template
+# These rules detect network scanning activities
+
+# TCP Port Scan Detection
+alert tcp any any -> $HOME_NET any (msg:"TCP Port Scan Detected"; flags:S,12; threshold:type threshold, track by_src, count 20, seconds 60; sid:1000101; rev:1;)
+
+# UDP Port Scan Detection
+alert udp any any -> $HOME_NET any (msg:"UDP Port Scan Detected"; threshold:type threshold, track by_src, count 20, seconds 60; sid:1000102; rev:1;)
+
+# Stealth Port Scan (SYN only, no ACK)
+alert tcp any any -> $HOME_NET any (msg:"Stealth Port Scan"; flags:S,12; threshold:type threshold, track by_src, count 15, seconds 60; sid:1000103; rev:1;)
+
+# Horizontal Port Scan (same port, multiple hosts)
+alert tcp any any -> $HOME_NET any (msg:"Horizontal Port Scan"; threshold:type threshold, track by_dst, count 10, seconds 60; sid:1000104; rev:1;)
+
+# Vertical Port Scan (same host, multiple ports)
+alert tcp any any -> $HOME_NET any (msg:"Vertical Port Scan"; threshold:type threshold, track by_dst, count 15, seconds 60; sid:1000105; rev:1;)

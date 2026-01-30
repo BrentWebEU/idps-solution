@@ -1,3 +1,7 @@
+mod models;
+mod pcap_analyzer;
+mod rule_generator;
+
 use actix_web::{App, HttpResponse, HttpServer, Responder, get, post, web};
 use actix_cors::Cors;
 use bollard::Docker;
@@ -5,6 +9,11 @@ use bollard::container::StopContainerOptions;
 use futures_util::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::fs;
+use std::path::Path;
+use models::*;
+use pcap_analyzer::PcapAnalyzer;
+use rule_generator::RuleGenerator;
 
 // Struct om de Docker client instantie te bewaren
 // Deze wordt gebruikt om commando's uit te voeren op Docker containers
@@ -50,7 +59,14 @@ async fn root() -> impl Responder {
             "POST /api/suricata/stop": "Stop de Suricata container",
             "POST /api/suricata/restart": "Herstart de Suricata container",
             "POST /api/suricata/exec": "Voer een commando uit in de Suricata container",
-            "GET /api/suricata/logs": "Haal de logs op van de Suricata container"
+            "GET /api/suricata/logs": "Haal de logs op van de Suricata container",
+            "POST /api/pcap/analyze": "Analyze PCAP file and extract attack patterns",
+            "GET /api/pcap/findings": "Retrieve vulnerability findings from PCAP analysis",
+            "POST /api/rules/generate": "Generate Suricata rules from findings",
+            "GET /api/rules/list": "List all custom rules",
+            "POST /api/rules/activate": "Activate a rule in Suricata",
+            "POST /api/rules/deactivate": "Deactivate a rule",
+            "POST /api/rules/test": "Test rules against PCAP"
         }
     });
     
@@ -346,6 +362,220 @@ async fn get_logs(docker_client: web::Data<DockerClient>) -> impl Responder {
     })
 }
 
+// Analyze PCAP file and extract attack patterns
+#[post("/api/pcap/analyze")]
+async fn analyze_pcap(req_body: web::Json<PcapAnalysisRequest>) -> impl Responder {
+    let pcap_path = &req_body.pcap_file;
+    let default_options = AnalysisOptions::default();
+    let options = req_body.analysis_options.as_ref().unwrap_or(&default_options);
+    
+    // Validate PCAP file exists
+    if !Path::new(pcap_path).exists() {
+        return HttpResponse::BadRequest().json(ApiResponse {
+            success: false,
+            message: format!("PCAP file not found: {}", pcap_path),
+            data: None,
+        });
+    }
+    
+    // Analyze PCAP
+    match PcapAnalyzer::analyze_pcap(pcap_path, options) {
+        Ok(result) => {
+            // Save findings to JSON file
+            let findings_dir = "../lab/findings";
+            fs::create_dir_all(findings_dir).ok();
+            
+            let findings_file = format!("{}/findings_{}.json", findings_dir, 
+                chrono::Utc::now().format("%Y%m%d_%H%M%S"));
+            
+            if let Ok(json_str) = serde_json::to_string_pretty(&result) {
+                fs::write(&findings_file, json_str).ok();
+            }
+            
+            HttpResponse::Ok().json(ApiResponse {
+                success: true,
+                message: "PCAP analysis completed successfully".to_string(),
+                data: Some(serde_json::to_value(result).unwrap()),
+            })
+        }
+        Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+            success: false,
+            message: format!("Error analyzing PCAP: {}", e),
+            data: None,
+        }),
+    }
+}
+
+// Retrieve vulnerability findings
+#[get("/api/pcap/findings")]
+async fn get_findings() -> impl Responder {
+    let findings_dir = "../lab/findings";
+    
+    if !Path::new(findings_dir).exists() {
+        return HttpResponse::Ok().json(ApiResponse {
+            success: true,
+            message: "No findings directory found".to_string(),
+            data: Some(serde_json::json!([])),
+        });
+    }
+    
+    let mut findings = Vec::new();
+    
+    // Read all JSON files from findings directory
+    if let Ok(entries) = fs::read_dir(findings_dir) {
+        for entry in entries.flatten() {
+            if let Ok(file_type) = entry.file_type() {
+                if file_type.is_file() {
+                    if let Some(ext) = entry.path().extension() {
+                        if ext == "json" {
+                            if let Ok(content) = fs::read_to_string(entry.path()) {
+                                if let Ok(json_value) = serde_json::from_str::<serde_json::Value>(&content) {
+                                    findings.push(json_value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    HttpResponse::Ok().json(ApiResponse {
+        success: true,
+        message: format!("Found {} findings files", findings.len()),
+        data: Some(serde_json::json!(findings)),
+    })
+}
+
+// Generate Suricata rules from findings
+#[post("/api/rules/generate")]
+async fn generate_rules(req_body: web::Json<VulnerabilityFinding>) -> impl Responder {
+    let rules_dir = "../idps/rules";
+    
+    match RuleGenerator::generate_rule_from_finding(&req_body.into_inner()) {
+        Ok(rule) => {
+            let filename = format!("rule_{}.rules", uuid::Uuid::new_v4());
+            
+            match RuleGenerator::save_rule(&rule, &filename, rules_dir) {
+                Ok(filepath) => HttpResponse::Ok().json(ApiResponse {
+                    success: true,
+                    message: "Rule generated successfully".to_string(),
+                    data: Some(serde_json::json!({
+                        "rule": rule,
+                        "filename": filename,
+                        "filepath": filepath
+                    })),
+                }),
+                Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+                    success: false,
+                    message: format!("Failed to save rule: {}", e),
+                    data: None,
+                }),
+            }
+        }
+        Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+            success: false,
+            message: format!("Failed to generate rule: {}", e),
+            data: None,
+        }),
+    }
+}
+
+// List all custom rules
+#[get("/api/rules/list")]
+async fn list_rules() -> impl Responder {
+    let rules_dir = "../idps/rules";
+    
+    match RuleGenerator::list_rules(rules_dir) {
+        Ok(rules) => HttpResponse::Ok().json(ApiResponse {
+            success: true,
+            message: format!("Found {} rules", rules.len()),
+            data: Some(serde_json::json!(rules)),
+        }),
+        Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+            success: false,
+            message: format!("Failed to list rules: {}", e),
+            data: None,
+        }),
+    }
+}
+
+// Activate a rule
+#[derive(Deserialize)]
+struct RuleActivateRequest {
+    rule_file: String,
+}
+
+#[post("/api/rules/activate")]
+async fn activate_rule(req_body: web::Json<RuleActivateRequest>) -> impl Responder {
+    let rules_dir = "../idps/rules";
+    
+    match RuleGenerator::activate_rule(&req_body.rule_file, rules_dir) {
+        Ok(filepath) => {
+            // Restart Suricata to load new rules
+            // This would typically be done via Docker API
+            HttpResponse::Ok().json(ApiResponse {
+                success: true,
+                message: "Rule activated successfully".to_string(),
+                data: Some(serde_json::json!({
+                    "rule_file": req_body.rule_file,
+                    "active_path": filepath,
+                    "note": "Suricata may need to be restarted to load the rule"
+                })),
+            })
+        }
+        Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+            success: false,
+            message: format!("Failed to activate rule: {}", e),
+            data: None,
+        }),
+    }
+}
+
+// Deactivate a rule
+#[post("/api/rules/deactivate")]
+async fn deactivate_rule(req_body: web::Json<RuleActivateRequest>) -> impl Responder {
+    let rules_dir = "../idps/rules";
+    
+    match RuleGenerator::deactivate_rule(&req_body.rule_file, rules_dir) {
+        Ok(_) => HttpResponse::Ok().json(ApiResponse {
+            success: true,
+            message: "Rule deactivated successfully".to_string(),
+            data: Some(serde_json::json!({
+                "rule_file": req_body.rule_file,
+                "note": "Suricata may need to be restarted to unload the rule"
+            })),
+        }),
+        Err(e) => HttpResponse::InternalServerError().json(ApiResponse {
+            success: false,
+            message: format!("Failed to deactivate rule: {}", e),
+            data: None,
+        }),
+    }
+}
+
+// Test rules against PCAP
+#[derive(Deserialize)]
+struct RuleTestRequest {
+    pcap_file: String,
+    rule_file: Option<String>,
+}
+
+#[post("/api/rules/test")]
+async fn test_rules(req_body: web::Json<RuleTestRequest>) -> impl Responder {
+    // This is a placeholder - actual rule testing would require Suricata
+    // or a compatible rule testing tool
+    
+    HttpResponse::Ok().json(ApiResponse {
+        success: true,
+        message: "Rule testing not yet implemented".to_string(),
+        data: Some(serde_json::json!({
+            "pcap_file": req_body.pcap_file,
+            "note": "Rule testing requires Suricata or compatible tool"
+        })),
+    })
+}
+
 // Hoofdfunctie - start de HTTP server
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -404,6 +634,13 @@ async fn main() -> std::io::Result<()> {
             .service(restart_suricata)
             .service(execute_suricata_command)
             .service(get_logs)
+            .service(analyze_pcap)
+            .service(get_findings)
+            .service(generate_rules)
+            .service(list_rules)
+            .service(activate_rule)
+            .service(deactivate_rule)
+            .service(test_rules)
     })
     .bind(&bind_address)?
     .run()

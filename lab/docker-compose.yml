@@ -3,6 +3,10 @@ version: '3.8'
 services:
   # Attacker machine (Kali Linux)
   kali:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     image: kalilinux/kali-rolling
     container_name: pentest-kali
     networks:
@@ -17,19 +21,31 @@ services:
 
   # DMZ Network - Public facing web server (old Apache version)
   web-server:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     image: httpd:2.4.41
     container_name: pentest-web
     networks:
       - dmz-net
       - internal-net
     ports:
+<<<<<<< HEAD
       - "8080:80"
+=======
+      - "8081:80"
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     volumes:
       - ./web-server:/usr/local/apache2/htdocs:ro
     command: httpd-foreground
 
   # Internal Network - Database (weak credentials, exposed)
   db-server:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     image: mysql:5.7
     container_name: pentest-db
     networks:
@@ -47,6 +63,10 @@ services:
 
   # Internal Network - File Server (FTP/SMB)
   file-server:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     build:
       context: ./file-server
       dockerfile: Dockerfile
@@ -62,6 +82,10 @@ services:
 
   # Internal Network - Vulnerable Linux System
   vulnerable-linux:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     build:
       context: ./vulnerable-linux
       dockerfile: Dockerfile
@@ -78,6 +102,10 @@ services:
 
   # WPA2 Enterprise RADIUS Server
   radius-server:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     build:
       context: ./radius-server
       dockerfile: Dockerfile
@@ -96,6 +124,10 @@ services:
 
   # Jump Host / Gateway (simulates network segmentation)
   gateway:
+<<<<<<< HEAD
+=======
+    platform: linux/x86_64
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
     image: alpine:latest
     container_name: pentest-gateway
     networks:
@@ -108,6 +140,27 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
 
+<<<<<<< HEAD
+=======
+  # Traffic Capture Service - captures network traffic for analysis
+  traffic-capture:
+    platform: linux/x86_64
+    image: nicolaka/netshoot:latest
+    container_name: pentest-capture
+    networks:
+      - dmz-net
+      - internal-net
+      - attacker-net
+    volumes:
+      - ./captures:/captures
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: sh -c "tail -f /dev/null"
+    depends_on:
+      - gateway
+
+>>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
 networks:
   attacker-net:
     driver: bridge

@@ -1,0 +1,17 @@
+# RADIUS Attack Detection Rules Template
+# These rules detect RADIUS-specific attack patterns
+
+# RADIUS Authentication Replay Attack
+alert udp any any -> $HOME_NET 1812 (msg:"RADIUS Authentication Replay Attempt"; threshold:type threshold, track by_src, count 5, seconds 10; sid:1000301; rev:1;)
+
+# RADIUS Weak Secret Detection (multiple failed auths with same secret)
+alert udp any any -> $HOME_NET 1812 (msg:"RADIUS Weak Secret Suspected"; threshold:type threshold, track by_src, count 20, seconds 60; sid:1000302; rev:1;)
+
+# RADIUS EAP Method Enumeration
+alert udp any any -> $HOME_NET 1812 (msg:"RADIUS EAP Method Enumeration"; threshold:type threshold, track by_src, count 10, seconds 30; sid:1000303; rev:1;)
+
+# RADIUS Accounting Bypass Attempt
+alert udp any any -> $HOME_NET 1813 (msg:"RADIUS Accounting Bypass Attempt"; threshold:type threshold, track by_src, count 5, seconds 60; sid:1000304; rev:1;)
+
+# RADIUS VLAN Hopping Attempt
+alert udp any any -> $HOME_NET 1812 (msg:"RADIUS VLAN Assignment Manipulation"; threshold:type threshold, track by_src, count 3, seconds 60; sid:1000305; rev:1;)
