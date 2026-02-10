@@ -1,0 +1,82 @@
+COMPANY EMPLOYEE DIRECTORY - CONFIDENTIAL
+==========================================
+
+IT Department
+-------------
+John Smith - john.smith@company.com - ext. 101
+  Title: Senior System Administrator
+  SSN: 123-45-6789
+  Home: 555-0101
+  Emergency Contact: Jane Smith (spouse) - 555-0102
+  VPN Username: jsmith
+  VPN Password: JS_vpn2024!
+
+Robert Martinez - robert.martinez@company.com - ext. 107  
+  Title: Network Engineer
+  SSN: 789-01-2345
+  Home: 555-0107
+  VPN Username: rmartinez
+  VPN Password: Network@2024
+
+Finance Department
+------------------
+Sarah Johnson - sarah.johnson@company.com - ext. 102
+  Title: CFO
+  SSN: 234-56-7890
+  Home: 555-0102
+  Bank Account (Company Card): **** **** **** 9010
+  Building Access Code: 2468
+
+HR Department
+-------------
+Jennifer Garcia - jennifer.garcia@company.com - ext. 106
+  Title: HR Manager  
+  SSN: 678-90-1234
+  Home: 555-0106
+  Master Key Code: 9753
+
+Engineering
+-----------
+Emily Brown - emily.brown@company.com - ext. 104
+  Title: Lead Developer
+  SSN: 456-78-9012
+  Home: 555-0104
+  GitHub: emily-brown-dev
+  SSH Key: ~/.ssh/emily_rsa
+
+Mary Anderson - mary.anderson@company.com - ext. 110
+  Title: DevOps Engineer
+  SSN: 012-34-5678
+  Home: 555-0110
+  Root Server Access: YES
+  Sudo Password: M@ry_Sudo_2024
+
+Management
+----------
+David Jones - david.jones@company.com - ext. 105
+  Title: CEO
+  SSN: 567-89-0123
+  Home: 555-0105
+  Personal Assistant: Linda (ext. 201)
+  Office Safe Code: 1-8-3-7
+  Master Admin Password: CEO_M@ster_2024!
+
+Building Security Codes:
+- Front Door: 2468#
+- Server Room: 1357#
+- Executive Suite: 8642#
+- Roof Access: 9999#
+
+WiFi Credentials:
+- Corporate SSID: CompanyWiFi
+- Password: C0mp@ny_W1F1_2024!
+- Admin SSID: CompanyAdmin  
+- Password: @dm1n_W1F1_S3cr3t
+
+Server Room Access:
+- Key Card Required: YES
+- Backup PIN: 135792
+- After Hours: Contact Security (ext. 911)
+
+CLASSIFICATION: INTERNAL USE ONLY
+DO NOT DISTRIBUTE

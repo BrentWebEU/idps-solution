@@ -7,6 +7,8 @@
         .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         h1 { color: #333; }
         .info { margin: 20px 0; padding: 15px; background: #e7f3ff; border-left: 4px solid #2196F3; }
+        .info a { color: #1976d2; text-decoration: none; font-weight: bold; }
+        .info a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -17,6 +19,14 @@
             <p><strong>Status:</strong> Online</p>
             <p><strong>Purpose:</strong> Internal company portal</p>
             <p><strong>Network:</strong> DMZ Zone</p>
+        </div>
+        <div class="info">
+            <h2>Portal Access</h2>
+            <ul>
+                <li><a href="login.html">Employee Portal Login</a></li>
+                <li><a href="admin.html">Admin Dashboard</a> (Requires Authentication)</li>
+                <li><a href="database.html">Database Management</a> (Admin Only)</li>
+            </ul>
         </div>
         <div class="info">
             <h2>Available Services</h2>
@@ -32,6 +42,11 @@
             <p><strong>DMZ Network:</strong> 172.21.0.0/24</p>
             <p><strong>Internal Network:</strong> 172.22.0.0/24</p>
             <p><strong>Attacker Network:</strong> 172.20.0.0/24</p>
+        </div>
+        <div class="info" style="background: #fff3e0; border-left: 4px solid #ff9800;">
+            <h2>⚠️ Pentesting Lab Notice</h2>
+            <p>This is an intentionally vulnerable web application for security testing.</p>
+            <p>Discover vulnerabilities and practice penetration testing techniques.</p>
         </div>
     </div>
 </body>

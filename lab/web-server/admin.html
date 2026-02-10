@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel - Company Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .header {
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        .stat-box .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .menu {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .menu a {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .menu a:hover {
+            background: #5568d3;
+        }
+        .secret {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        code {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔒 Admin Control Panel</h1>
+        <p>Welcome, Administrator | <a href="index.html" style="color: #4fc3f7">Logout</a></p>
+    </div>
+
+    <div class="container">
+        <h2>System Dashboard</h2>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Active Users</h3>
+                <div class="number">247</div>
+            </div>
+            <div class="stat-box">
+                <h3>Total Employees</h3>
+                <div class="number">10</div>
+            </div>
+            <div class="stat-box">
+                <h3>Customer Records</h3>
+                <div class="number">5,432</div>
+            </div>
+            <div class="stat-box">
+                <h3>Security Alerts</h3>
+                <div class="number">12</div>
+            </div>
+        </div>
+
+        <div class="menu">
+            <h3>Quick Actions</h3>
+            <a href="users.html">Manage Users</a>
+            <a href="database.html">Database Access</a>
+            <a href="files.html">File Management</a>
+            <a href="logs.html">System Logs</a>
+            <a href="config.html">Configuration</a>
+        </div>
+
+        <div class="secret">
+            <h3>🔓 Admin Secrets (Congratulations!)</h3>
+            <p><strong>FLAG:</strong> <code>FLAG{ADMIN_PANEL_ACCESS_GRANTED}</code></p>
+            <p>You've successfully bypassed authentication and accessed the admin panel!</p>
+            
+            <h4>Exposed Information:</h4>
+            <ul>
+                <li><strong>Database Server:</strong> 172.22.0.3:3306</li>
+                <li><strong>DB Username:</strong> admin</li>
+                <li><strong>DB Password:</strong> admin123</li>
+                <li><strong>File Server:</strong> 172.22.0.4 (FTP: port 21, SMB: port 445)</li>
+                <li><strong>SSH Server:</strong> 172.22.0.5:22</li>
+                <li><strong>Internal Network:</strong> 172.22.0.0/24</li>
+            </ul>
+
+            <h4>Next Steps:</h4>
+            <ol>
+                <li>Connect to database and exfiltrate customer data</li>
+                <li>Access file server for configuration files and credentials</li>
+                <li>Use discovered credentials for lateral movement</li>
+                <li>Establish persistence in the network</li>
+            </ol>
+        </div>
+
+        <div style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-top: 20px;">
+            <h3>Network Topology</h3>
+            <pre style="background: white; padding: 15px; border-radius: 3px; overflow-x: auto;">
+DMZ Network (172.21.0.0/24):
+  ├── Web Server (172.21.0.2)
+  └── RADIUS Server (172.21.0.3)
+
+Internal Network (172.22.0.0/24):
+  ├── Database Server (172.22.0.3)
+  ├── File Server (172.22.0.4)
+  └── Vulnerable Linux (172.22.0.5)
+
+Attacker Network (172.20.0.0/24):
+  └── Kali Linux (172.20.0.2)
+            </pre>
+        </div>
+    </div>
+</body>
+</html>

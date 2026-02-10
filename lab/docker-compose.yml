@@ -10,6 +10,9 @@ services:
       - attacker-net
     volumes:
       - kali-data:/root
+      - ./captures:/captures
+      - ./findings:/findings
+      - ./reports:/reports
     tty: true
     stdin_open: true
     command: /bin/bash
@@ -47,6 +50,7 @@ services:
       MYSQL_PASSWORD: admin123
     volumes:
       - db-data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
     command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
 
   # Internal Network - File Server (FTP/SMB)
@@ -64,6 +68,7 @@ services:
       - "139:139"
     volumes:
       - file-data:/shared
+      - ./file-server/shared-files:/shared/public:ro
 
   # Internal Network - Vulnerable Linux System
   vulnerable-linux:

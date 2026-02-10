@@ -126,16 +126,69 @@ WPA2 Enterprise Network Segmentation:
 # Start all services
 docker-compose up -d
 
+# Load database with real data
+cat db-init/init.sql | docker exec -i pentest-db mysql -uroot -proot company_db
+
 # View running containers
 docker-compose ps
 
-# View logs
-docker-compose logs -f
+# Verify everything works
+./scripts/demo-lab.sh
+```
+
+### Generate Professional HTML Report
+
+```bash
+# Generate comprehensive pentest report with all findings
+./scripts/internal-pentest-report.sh
+
+# Open the report (macOS)
+open reports/internal_lab_report_*.html
 ```
 
 ### Accessing Services
 
-- **Web Server:** http://localhost:8081
+- **Web Server:** http://localhost:8080
+  - Login Page: http://localhost:8080/login.html (Try SQL injection!)
+  - Admin Panel: http://localhost:8080/admin.html
+  - Database Info: http://localhost:8080/database.html
+
+### Real Data Available
+
+The lab now includes **realistic data** for authentic pentesting:
+
+#### Database (MySQL)
+```bash
+docker exec -it pentest-db mysql -uadmin -padmin123 company_db
+
+# Query sensitive data
+SELECT first_name, last_name, ssn, salary FROM employees;
+SELECT full_name, credit_card, cvv FROM customers;
+SELECT system_name, username, password FROM system_credentials;
+SELECT secret_name, secret_value FROM company_secrets;
+```
+
+**Available Data**:
+- 20 employee records (SSN, salaries, contact info)
+- 10 customer records (credit cards with CVV, addresses)
+- 16 system credentials (plaintext passwords, API keys)
+- 14 company secrets (AWS keys, Stripe keys, certificates)
+
+#### File Server (FTP/SMB)
+Sensitive files in `/shared/public/`:
+- `Q4_Financial_Report.txt` - Financial data, DB credentials, AWS keys
+- `production_config.ini` - System credentials, API keys, JWT secrets
+- `employee_directory.txt` - SSNs, VPN passwords, building codes
+- `backup_script.sh` - Database credentials, AWS S3 access
+- `database_backup.sql.old` - Customer data backup
+- `flag.txt` - CTF-style challenge flag
+
+Access via FTP:
+```bash
+ftp localhost 21
+# Username: anonymous (or ftpuser)
+# Password: (empty or password123)
+```
 
 ### Interactive Lab Menu (Choose What, Where & How)
 

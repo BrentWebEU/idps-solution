@@ -1,0 +1,29 @@
+FLAG{SMB_FTP_ACCESS_GRANTED_SECRET_DATA_FOUND}
+
+Congratulations! You have successfully accessed the file server.
+
+You have discovered sensitive company files including:
+- Financial reports with database credentials
+- Configuration files with API keys
+- Employee directory with SSNs and passwords
+- Backup scripts with AWS credentials
+
+This demonstrates the risk of:
+1. Weak file share permissions
+2. Storing credentials in plain text
+3. Insufficient access controls
+4. Lack of data encryption
+
+Next Steps for Attacker:
+- Use discovered credentials to access database
+- Pivot to internal systems using SSH credentials
+- Exfiltrate sensitive customer data
+- Establish persistence with discovered API keys
+
+Remediation:
+- Implement proper access controls (ACLs)
+- Use encryption for sensitive data at rest
+- Store credentials in secure vaults (HashiCorp Vault, AWS Secrets Manager)
+- Enable audit logging for file access
+- Implement data loss prevention (DLP) policies
+- Regular security audits and penetration testing

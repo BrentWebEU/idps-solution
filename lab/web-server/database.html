@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Access - Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .credentials {
+            background: #ffe0b2;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #667eea;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        code {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Database Management</h1>
+        <a href="admin.html">← Back to Dashboard</a>
+
+        <div class="credentials">
+            <h3>Database Connection Information</h3>
+            <p><strong>Host:</strong> 172.22.0.3</p>
+            <p><strong>Port:</strong> 3306</p>
+            <p><strong>Root Password:</strong> <code>root</code></p>
+            <p><strong>Admin User:</strong> admin / <code>admin123</code></p>
+            <p><strong>Database:</strong> company_db</p>
+        </div>
+
+        <h2>Quick Reference - Available Tables</h2>
+        <table>
+            <tr>
+                <th>Table Name</th>
+                <th>Description</th>
+                <th>Sensitive Data</th>
+            </tr>
+            <tr>
+                <td>employees</td>
+                <td>Employee records with personal information</td>
+                <td>SSN, Salaries, Contact Info</td>
+            </tr>
+            <tr>
+                <td>customers</td>
+                <td>Customer database with payment info</td>
+                <td>Credit Cards, CVV, Addresses</td>
+            </tr>
+            <tr>
+                <td>system_credentials</td>
+                <td>Stored system passwords (plaintext!)</td>
+                <td>Admin passwords, API keys</td>
+            </tr>
+            <tr>
+                <td>company_secrets</td>
+                <td>API keys and sensitive tokens</td>
+                <td>AWS keys, Stripe keys, Certificates</td>
+            </tr>
+            <tr>
+                <td>access_logs</td>
+                <td>System access audit logs</td>
+                <td>User activities, IP addresses</td>
+            </tr>
+        </table>
+
+        <h2>Sample Queries for Pentesters</h2>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 14px;">
+            <p># Connect to database:</p>
+            <p><code>mysql -h 172.22.0.3 -u admin -padmin123 company_db</code></p>
+            <br>
+            <p># Get all employees with high salaries:</p>
+            <p><code>SELECT first_name, last_name, email, ssn, salary FROM employees WHERE salary > 80000;</code></p>
+            <br>
+            <p># Get all customer credit cards:</p>
+            <p><code>SELECT full_name, credit_card, cvv, expiry FROM customers WHERE account_status='active';</code></p>
+            <br>
+            <p># Get all system credentials:</p>
+            <p><code>SELECT * FROM system_credentials;</code></p>
+            <br>
+            <p># Get company secrets:</p>
+            <p><code>SELECT * FROM company_secrets WHERE classification IN ('TOP_SECRET', 'CONFIDENTIAL');</code></p>
+        </div>
+    </div>
+</body>
+</html>

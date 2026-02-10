@@ -27,6 +27,7 @@ if [ -d "$FINDINGS_DIR" ]; then
         "$FINDINGS_DIR"/findings_${TARGET_IP//\./_}_*.json \
         "$FINDINGS_DIR"/*${TARGET_IP//\./_}*.json \
         "$FINDINGS_DIR"/*${TARGET_IP}*.json \
+        "$FINDINGS_DIR"/dns_findings_${TARGET_IP//\./_}_*.json \
         "$FINDINGS_DIR"/pcap_analysis_*.json; do
         if [ -f "$json_file" ]; then
             filename=$(basename "$json_file")
@@ -77,8 +78,49 @@ for json_file in json_files:
         with open(json_file, 'r') as f:
             data = json.load(f)
         
-        # Check for findings array
-        if 'findings' in data and isinstance(data['findings'], list) and len(data['findings']) > 0:
+        # Check for findings array (direct list)
+        if isinstance(data, list):
+            for finding in data:
+                # Assuming findings are directly in the list and conform to the expected finding structure
+                severity = finding.get('severity', 'medium')
+                finding_type = finding.get('finding_type', finding.get('type', 'Unknown Finding'))
+                target = finding.get('target', '')
+                target_ip = finding.get('target_ip', '')
+                description = finding.get('description', '')
+                payload = finding.get('payload', '')
+                evidence = finding.get('evidence', '')
+                source_ip = finding.get('source_ip', '')
+                port = finding.get('port', '')
+                service = finding.get('service', '')
+                username = finding.get('username', '') # For brute_force_success
+                password = finding.get('password', '') # For brute_force_success
+                
+                findings_html += f'<div class="finding {severity}">'
+                findings_html += f'<h3>{html.escape(str(finding_type).replace("_", " ").title())}</h3>'
+                if target:
+                    findings_html += f'<p><strong>Target:</strong> {html.escape(str(target))}</p>'
+                if target_ip and target_ip != 'N/A': # Check for 'N/A' from dnsrecon parsing
+                    findings_html += f'<p><strong>IP:</strong> {html.escape(str(target_ip))}</p>'
+                if severity:
+                    findings_html += f'<p><strong>Severity:</strong> <span class="severity severity-{severity}">{severity.upper()}</span></p>'
+                if description:
+                    findings_html += f'<p><strong>Description:</strong> {html.escape(str(description))}</p>'
+                if service:
+                    findings_html += f'<p><strong>Service:</strong> {html.escape(str(service))}</p>'
+                if port:
+                    findings_html += f'<p><strong>Port:</strong> {port}</p>'
+                if username:
+                    findings_html += f'<p><strong>Username:</strong> {html.escape(str(username))}</p>'
+                if password:
+                    findings_html += f'<p><strong>Password:</strong> {html.escape(str(password))}</p>'
+                if payload:
+                    findings_html += f'<p><strong>Payload:</strong> <code>{html.escape(str(payload))}</code></p>'
+                if evidence:
+                    findings_html += f'<p><strong>Evidence:</strong> <code class="code-block">{html.escape(str(evidence))}</code></p>' # Use code-block for multiline
+                findings_html += '</div>'
+
+        # Check for findings array (nested under 'findings' key)
+        elif 'findings' in data and isinstance(data['findings'], list) and len(data['findings']) > 0:
             for finding in data['findings']:
                 severity = finding.get('severity', 'medium')
                 finding_type = finding.get('finding_type', finding.get('type', 'Unknown Finding'))
@@ -305,12 +347,16 @@ cat > "$REPORT_FILE" <<EOF
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .code {
+        .code-block {
             background-color: #f4f4f4;
             padding: 10px;
             border-radius: 3px;
             font-family: monospace;
+            white-space: pre-wrap; /* Ensures newlines are preserved */
+            word-break: break-all; /* Breaks long words */
             overflow-x: auto;
+            display: block; /* Ensures it takes up full width */
+            margin-top: 5px;
         }
         .recommendations {
             background-color: #e3f2fd;

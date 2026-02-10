@@ -1,0 +1,29 @@
+# Database Backup - Company Customer Data
+# Created: 2024-01-15 02:30:00
+# File: customers_backup_20240115.sql
+
+-- MySQL dump 10.13  Distrib 5.7.44
+
+USE company_db;
+
+-- Dumping data for table `customers`
+INSERT INTO `customers` VALUES 
+(1,'Alice Cooper','alice.cooper@email.com','555-1001','123 Main St','New York','NY','10001','4532-1234-5678-9010','123','2025-12-31','active'),
+(2,'Bob Taylor','bob.taylor@email.com','555-1002','456 Oak Ave','Los Angeles','CA','90001','5425-2345-6789-0123','456','2026-06-30','active'),
+(3,'Carol White','carol.white@email.com','555-1003','789 Pine Rd','Chicago','IL','60601','4916-3456-7890-1234','789','2025-09-30','suspended');
+
+-- Administrator account
+INSERT INTO `admin_users` VALUES 
+(1,'super_admin','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5eoR7q9SBN8Oe','root@company.com','2024-01-01');
+-- Password: SuperAdm1n!2024
+
+-- API Keys Table  
+INSERT INTO `api_keys` VALUES
+(1,'production_key','pk_live_51HxQR8K9mP3nL4oY','active','2024-01-15'),
+(2,'backup_key','pk_test_TYooMQauvdEDq54NiTphI7jx','active','2024-01-15');
+
+-- Database admin credentials
+-- Username: db_backup_user
+-- Password: DB_B@ckup_P@ss_2024!
+-- Host: 172.22.0.3
+-- Privileges: SELECT, INSERT, UPDATE, DELETE on company_db.*
