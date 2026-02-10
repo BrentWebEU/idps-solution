@@ -133,11 +133,29 @@ docker-compose ps
 docker-compose logs -f
 ```
 
-<<<<<<< HEAD
 ### Accessing Services
 
-- **Web Server:** http://localhost:8080
-=======
+- **Web Server:** http://localhost:8081
+
+### Interactive Lab Menu (Choose What, Where & How)
+
+Use the interactive menu to select what to run, which targets, and how (with or without capture, reports, etc.):
+
+```bash
+cd lab
+./scripts/lab-menu.sh
+```
+
+The menu lets you:
+- **Internal Lab Pentest** – Full automated pentest, or only discovery / vuln scan / credentials / exploitation; optional full workflow with capture and report.
+- **External Pentest** – Run external pentest only, or full workflow (capture + pentest + extract findings + report). You choose the target IP.
+- **Attack Testing** – DDOS (target, port, duration, type), Brute-Force (target, service, wordlist), Network Infiltration (target, type). Optional traffic capture before/after.
+- **Traffic Capture** – Start, stop, or check status of packet capture.
+- **Analysis & Reporting** – Analyze a PCAP, extract findings from Nmap XML, generate internal/external reports, or vulnerability summary.
+- **Run Full Attack Suite** – Run DDOS + Brute-Force + Infiltration with capture and report (with IP prompts).
+
+All options are wired to the existing scripts; the menu only collects your choices (targets, IPs, options) and runs them.
+
 ### External Penetration Testing
 
 The lab also supports external penetration testing against external targets:
@@ -220,7 +238,6 @@ This script automatically:
 ### Accessing Services
 
 - **Web Server:** http://localhost:8081
->>>>>>> 19bcb69 (Add scripts for external pentest workflow and vulnerability scanning)
 - **RADIUS Server:** localhost:1812/udp, 1813/udp
 - **MySQL:** localhost:3306
 - **FTP:** localhost:21

@@ -1,0 +1,10 @@
+[package]
+name = "raspi-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.12.1"
+pnet = "0.35.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0"

@@ -1,0 +1,52 @@
+# Docker Compose configuratie voor IDPS (Intrusion Detection and Prevention System)
+# Deze configuratie bevat de Suricata IDS/IPS en de controle API
+
+services:
+  # Suricata IDS/IPS container
+  # Dit is de hoofdcomponent die netwerkverkeer monitort en analyseert
+  suricata:
+    image: jasonish/suricata:latest
+    container_name: suricata
+    networks:
+      - idps-network
+    # Capabilities nodig voor netwerk monitoring
+    cap_add:
+      - NET_ADMIN  # Netwerk administratie rechten
+      - NET_RAW    # Raw socket toegang voor packet capture
+      - SYS_NICE   # Prioriteit aanpassingen
+    # Volume mount voor logs - logs worden opgeslagen op de host
+    volumes:
+      - ./logs:/var/log/suricata
+      - ./rules/custom:/etc/suricata/rules/custom:ro
+      - ./rules/active:/etc/suricata/rules/active:ro
+    # Suricata start commando - monitort eth0 interface
+    command: suricata -i eth0
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Brussels  # Tijdzone instelling voor België
+
+  # Rust API service voor container controle
+  # Deze API maakt het mogelijk om Suricata te starten, stoppen, herstarten en te monitoren
+  api:
+    build:
+      context: ../raspi-rust  # Build context wijst naar de raspi-rust directory
+    container_name: api
+    ports:
+      - "8080:8080"  # API is beschikbaar op poort 8080
+    networks:
+      - idps-network  # Deel van hetzelfde netwerk als Suricata
+    volumes:
+      - ./logs:/var/log/suricata  # Deel logs met API voor toegang
+      # Docker socket mount - nodig voor container controle via Docker API
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - suricata  # API start na Suricata
+    restart: unless-stopped
+    stdin_open: true  # Interactive mode
+    tty: true         # Terminal emulatie
+
+# Docker netwerk configuratie
+# Bridge netwerk voor communicatie tussen containers
+networks:
+  idps-network:
+    driver: bridge
