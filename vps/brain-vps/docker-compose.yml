@@ -1,0 +1,57 @@
+services:
+  # Suricata IDS/IPS container
+  suricata-vps:
+    image: jasonish/suricata:latest
+    container_name: suricata-vps
+    # Gebruik host netwerk voor IPS-modus op VPS (vereist voor NFQUEUE/iptables)
+    network_mode: host 
+    cap_add:
+      - NET_ADMIN  # Nodig voor het blokkeren van pakketten (IPS)
+      - NET_RAW    # Nodig voor packet capture
+      - SYS_NICE
+    volumes:
+      - ./logs:/var/log/suricata
+      - ./rules/custom:/etc/suricata/rules/custom:ro
+      - ./rules/active:/etc/suricata/rules/active:ro
+      - ./suricata.yaml:/etc/suricata/suricata.yaml:ro
+    # Op VPS draait Suricata vaak op eth0; gebruik NFQ voor IPS-functionaliteit
+    command: suricata -i eth0 --runmode workers
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Brussels
+
+  # Rust API service - De "Brain" van je IDPS
+  api-vps:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    container_name: api-vps
+    ports:
+      - "8080:8080"
+    # Toegang tot host netwerk om commando's naar de Pi te sturen via VPN/Tunnel
+    network_mode: host
+    volumes:
+      - ./logs:/var/log/suricata:ro # Alleen-lezen voor veiligheid (NFR02)
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data # Voor opslag van gedetecteerde dreigingen
+    depends_on:
+      - suricata-vps
+    restart: unless-stopped
+    # NFR02: Run als non-root user binnen de container waar mogelijk
+    user: "1000:1000" 
+
+  # Angular Admin Dashboard (Nieuw toegevoegd voor de VPS)
+  admin:
+    image: nginx:alpine
+    container_name: angular-admin
+    ports:
+      - "80:80"
+    volumes:
+      - ./dist/angular-admin:/usr/share/nginx/html:ro
+    networks:
+      - idps-network
+    restart: unless-stopped
+
+networks:
+  idps-network:
+    driver: bridge

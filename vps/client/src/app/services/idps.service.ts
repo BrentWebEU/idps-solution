@@ -39,7 +39,7 @@ export class IdpsService {
   // Base URL voor de API - gebruikt proxy configuratie in development
   // In development mode wordt dit via proxy.conf.json doorgestuurd naar localhost:8080
   // In production kan dit worden aangepast naar de productie API URL
-  private readonly apiUrl = '/api';
+  private readonly apiUrl = 'http://localhost:8081';
 
   constructor(private http: HttpClient) {}
 

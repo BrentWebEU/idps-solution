@@ -1,0 +1,82 @@
+%YAML 1.1
+---
+
+# Suricata Configuratie voor Provil-ION VPS
+# Geoptimaliseerd voor 12 vCPU's en 24GB RAM
+
+vars:
+  address-groups:
+    HOME_NET: "[192.168.139.2]" # Pas aan naar je school/VPN netwerk
+    EXTERNAL_NET: "!$HOME_NET"
+
+  port-groups:
+    HTTP_PORTS: "80"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: 1521
+    SSH_PORTS: 22
+
+# Afstelling voor 5 vCPU's (NFR04/Performance)
+threading:
+  set-cpu-affinity: yes
+  cpu-affinity:
+    - management-cpu-set:
+        cpu: [ 0 ]
+    - worker-cpu-set:
+        cpu: [ "1-4" ] # Gebruik 4 cores voor packet processing
+  detect-thread-ratio: 1.0
+
+# Log instellingen voor Rust API (Basis 5 - T11) [cite: 45, 101]
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      # Belangrijke types voor je Angular dashboard [cite: 45]
+      types:
+        - alert:
+            payload: yes             # Nodig voor diepe inspectie [cite: 71]
+            payload-buffer-size: 4kb
+            packet: yes
+            metadata: yes
+        - http:
+            extended: yes
+        - dns:
+            query: yes
+            answer: yes
+        - tls:
+            extended: yes
+        - flow:
+            enabled: yes             # Voor statistieken (FR09) [cite: 45]
+
+# IPS Instellingen via NFQUEUE (FR03 - Automatisch blokkeren) [cite: 45]
+nfq:
+  mode: accept # Verkeer doorlaten tenzij een regel 'drop' zegt
+  repeat-mark: 1
+  repeat-mask: 1
+  # Fail-open: als Suricata crasht, blijft het netwerk werken (NFR03) [cite: 47]
+  fail-open: yes 
+
+# Detectie Engine instellingen
+detect-engine:
+  - profile: high # Je hebt 24GB RAM, dus gebruik een zwaar profiel
+  - sgh-mpm-context: auto
+  - inspection-recursion-limit: 3000
+
+# Locatie van de regels (FR07) [cite: 45]
+default-rule-path: /etc/suricata/rules
+rule-files:
+  - suricata.rules
+  - /etc/suricata/rules/active/*.rules
+  - /etc/suricata/rules/custom/*.rules
+
+# Netwerk interface monitoring (eth0 op VPS)
+af-packet:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    use-mmap: yes
+
+logging:
+  default-log-level: notice
+  default-output-filter: ""

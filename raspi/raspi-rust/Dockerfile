@@ -19,5 +19,7 @@ RUN cargo build --release
 # Expose API port
 EXPOSE 8080
 
+ENV VPS_API_URL=http://172.20.10.6:8081
+
 # Run the application
 CMD ["./target/release/raspi-rust"]

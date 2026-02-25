@@ -4,9 +4,9 @@
 services:
   # Suricata IDS/IPS container
   # Dit is de hoofdcomponent die netwerkverkeer monitort en analyseert
-  suricata:
+  suricata-pi:
     image: jasonish/suricata:latest
-    container_name: suricata
+    container_name: suricata-pi
     networks:
       - idps-network
     # Capabilities nodig voor netwerk monitoring
@@ -27,10 +27,12 @@ services:
 
   # Rust API service voor container controle
   # Deze API maakt het mogelijk om Suricata te starten, stoppen, herstarten en te monitoren
-  api:
+  api-pi:
     build:
       context: ../raspi-rust  # Build context wijst naar de raspi-rust directory
-    container_name: api
+      dockerfile: Dockerfile
+      pull: true  # Pull fresh base images on every build
+    container_name: api-pi
     ports:
       - "8080:8080"  # API is beschikbaar op poort 8080
     networks:
@@ -40,7 +42,7 @@ services:
       # Docker socket mount - nodig voor container controle via Docker API
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
-      - suricata  # API start na Suricata
+      - suricata-pi  # API start na Suricata
     restart: unless-stopped
     stdin_open: true  # Interactive mode
     tty: true         # Terminal emulatie
