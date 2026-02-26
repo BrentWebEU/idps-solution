@@ -1,6 +1,0 @@
-files {
-    usersfile = ${confdir}/users
-    acctusersfile = ${confdir}/users
-    preproxy_usersfile = ${confdir}/users
-    compat = no
-}

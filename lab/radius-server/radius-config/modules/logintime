@@ -1,3 +1,0 @@
-logintime {
-    reply-message = "You are calling outside your allowed times  "
-}

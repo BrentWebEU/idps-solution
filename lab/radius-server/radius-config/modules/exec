@@ -1,6 +1,0 @@
-exec {
-    wait = yes
-    input_pairs = request
-    output_pairs = reply
-    shell_escape = yes
-}

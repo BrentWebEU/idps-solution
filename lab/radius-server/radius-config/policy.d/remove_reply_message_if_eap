@@ -1,7 +1,0 @@
-remove_reply_message_if_eap {
-    if (reply:EAP-Message) {
-        update reply {
-            Reply-Message := ""
-        }
-    }
-}

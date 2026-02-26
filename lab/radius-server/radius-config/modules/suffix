@@ -1,4 +1,0 @@
-suffix {
-    ntdomain = yes
-    with_ntdomain_hack = yes
-}
